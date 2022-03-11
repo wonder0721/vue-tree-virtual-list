@@ -1,29 +1,8 @@
-<template>
-  <virtual-list class="source-list" :data-key="'id'" :data-sources="items" :data-component="{}">
-    <template v-slot:item="{ item, index }">
-      <div class="treeitem" :style="{'padding-left': ((item.level - 1) * indent) + 'px'}">
-        <div class="fold-btn">
-          <span v-show="item.hasChildren" @click="toggleChildrenDisplay(item, index)" class="icon">
-            <slot v-if="item.expanded" name="expanded">-</slot>
-            <slot v-else name="collapsed">+</slot>
-          </span>
-        </div>
-        <Checkbox v-if="showCheckbox" :checked="item.checked" :indeterminate="item.indeterminate" @change="($event) => onChange(item, index, $event)"></Checkbox>
-        <div @click="onNodeClick(item)" style="margin-left: 5px; cursor:pointer">
-          <slot :node="item.data">
-            <span>{{ item.label }}</span>
-          </slot>
-        </div>
-      </div>
-    </template>
-  </virtual-list>
-</template>
-
-<script>
 import VirtualList from 'vue-virtual-scroll-list'
 import Checkbox from './checkbox'
 import { Node } from './node'
 import { flatTree, getExpandItem, recursionPostorderTraversal } from './utils'
+import './index.scss'
 
 export default {
   name: 'VirtualTree',
@@ -38,6 +17,14 @@ export default {
     nodeKey: {
       type: String,
       default: () => 'id'
+    },
+    height: {
+      type: Number,
+      default: () => 300
+    },
+    keeps: {
+      type: Number,
+      default: () => 30
     },
     props: {
       type: Object,
@@ -97,8 +84,8 @@ export default {
     handleData() {
       let { childNodes } = new Node({ data: this.data, props: this.props })
       this.sourceData = flatTree(childNodes)
-      this.items = this.sourceData.filter((item) => item.level === 1)
-      console.log(this.items)
+      this.items = this.sourceData.filter(item => item.level === 1)
+      // console.log(this.items)
     },
 
     /**
@@ -110,7 +97,7 @@ export default {
       // 节点选中状态更改时 所有子节点选中状态自动同步 递归计算父节点选中情况
       // 处理子节点
       if (item.hasChildren) {
-        const index = this.sourceData.findIndex((v) => v.id === item.id)
+        const index = this.sourceData.findIndex(v => v.id === item.id)
         for (let i = index + 1; i < this.sourceData.length; i++) {
           let v = this.sourceData[i]
           if (v.level === item.level) break
@@ -122,8 +109,8 @@ export default {
       this.setParentCheckStatus(item.parentId)
       // 共两个参数，依次为：传递给 data 属性的数组中该节点所对应的对象、树目前的选中状态对象
       this.$emit('check', item, {
-        checkedNodes: this.sourceData.filter((item) => item.checked),
-        checkedKeys: this.sourceData.filter((item) => item.checked).map((item) => item.id)
+        checkedNodes: this.sourceData.filter(item => item.checked),
+        checkedKeys: this.sourceData.filter(item => item.checked).map(item => item.id)
       })
       this.$emit('check-change', item, item.checked)
     },
@@ -150,10 +137,10 @@ export default {
       item.expanded = !item.expanded
     },
     setParentCheckStatus(parentId) {
-      if (parentId && this.sourceData.find((v) => v.id === parentId)) {
-        let parent = this.sourceData.find((v) => v.id === parentId)
-        const checkedAll = parent.childNodes.every((v) => v.checked)
-        const checkedNone = parent.childNodes.every((v) => !v.checked && !v.indeterminate)
+      if (parentId && this.sourceData.find(v => v.id === parentId)) {
+        let parent = this.sourceData.find(v => v.id === parentId)
+        const checkedAll = parent.childNodes.every(v => v.checked)
+        const checkedNone = parent.childNodes.every(v => !v.checked && !v.indeterminate)
         // 子节点全选 父节点设置全选
         if (checkedAll) parent.checked = true
         // 子节点全不选 父节点设置全不选
@@ -174,14 +161,14 @@ export default {
      * 若节点可被选择（即 show-checkbox 为 true），则返回目前被选中的节点的 key 所组成的数组
      */
     getCheckedKeys() {
-      return this.sourceData.filter((item) => item.checked).map((item) => item.data.id)
+      return this.sourceData.filter(item => item.checked).map(item => item.data.id)
     },
 
     /**
      * 若节点可被选择（即 show-checkbox 为 true），则返回目前被选中的节点的 node 所组成的数组
      */
     getCheckedNodes() {
-      return this.sourceData.filter((item) => item.checked).map((item) => item.data)
+      return this.sourceData.filter(item => item.checked).map(item => item.data)
     },
 
     /**
@@ -190,10 +177,10 @@ export default {
     setCheckedKeys(val) {
       console.log(val)
       // TODO 算法优化 类似于树的后序遍历
-      recursionPostorderTraversal(this.sourceData, (item) => {
+      recursionPostorderTraversal(this.sourceData, item => {
         if (item.hasChildren) {
-          item.checked = val.includes(item.data.id) || item.childNodes.every((v) => v.checked)
-          item.indeterminate = !item.checked && !item.childNodes.every((v) => !v.checked && !v.indeterminate)
+          item.checked = val.includes(item.data.id) || item.childNodes.every(v => v.checked)
+          item.indeterminate = !item.checked && !item.childNodes.every(v => !v.checked && !v.indeterminate)
         } else {
           item.checked = val.includes(item.data.id)
         }
@@ -204,7 +191,7 @@ export default {
      * 通过 key / data 设置某个节点的勾选状态
      */
     setChecked(id, val) {
-      const item = this.sourceData.find((v) => v.data.id === id)
+      const item = this.sourceData.find(v => v.data.id === id)
       if (item) {
         item.checked = !!val
         this.setParentCheckStatus(item.parentId)
@@ -212,6 +199,7 @@ export default {
     },
 
     onNodeClick(node) {
+      console.log(node)
       this.$emit('node-click', node.data)
     },
 
@@ -225,33 +213,98 @@ export default {
       } else if (!Object.prototype.toString.call(this.filterNodeMethod) === '[object Function]') {
         console.warn('prop filterNodeMethod expected Function')
       } else {
-        let filterData = this.sourceData.filter((item) => this.filterNodeMethod(val, item.data))
+        let filterData = this.sourceData.filter(item => this.filterNodeMethod(val, item.data))
         this.items = filterData
       }
     }
-  }
-}
-</script>
-
-<style lang="scss" scoped>
-.source-list {
-  height: 300px;
-  overflow-y: auto;
-  text-align: left;
-}
-.treeitem {
-  display: flex;
-  align-items: center;
-  .fold-btn {
-    width: 14px;
-    height: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    .icon {
-      cursor: pointer;
+  },
+  render(h) {
+    const renderContentFn = ({ item, index }) => {
+      const renderContent = []
+      renderContent.push(
+        h(
+          'div',
+          {
+            class: {
+              'fold-btn': true
+            }
+          },
+          item.hasChildren
+            ? [
+                h(
+                  'span',
+                  {
+                    class: {
+                      icon: true
+                    },
+                    on: {
+                      click: () => this.toggleChildrenDisplay(item, index)
+                    }
+                  },
+                  item.expanded ? '-' : '+'
+                )
+              ]
+            : ''
+        )
+      )
+      this.showCheckbox &&
+        renderContent.push(
+          h(Checkbox, {
+            props: {
+              checked: item.checked,
+              indeterminate: item.indeterminate
+            },
+            on: {
+              change: $event => this.onChange(item, index, $event)
+            }
+          })
+        )
+      renderContent.push(
+        h(
+          'div',
+          {
+            class: {
+              'node-content': true
+            },
+            on: {
+              click: () => this.onNodeClick(item)
+            }
+          },
+          this.$scopedSlots.default ? this.$scopedSlots.default({ node: item.data }) : item.label
+        )
+      )
+      return renderContent
     }
+
+    return h(VirtualList, {
+      class: {
+        'vue-tree-virtual-list': true
+      },
+      style: {
+        height: this.height + 'px',
+        'overflow-y': 'auto'
+      },
+      props: {
+        'data-key': 'id',
+        'data-sources': this.items,
+        'data-component': {},
+        keeps: this.keeps
+      },
+      scopedSlots: {
+        item: ({ item, index }) =>
+          h(
+            'div',
+            {
+              class: {
+                treeitem: true
+              },
+              style: {
+                'padding-left': (item.level - 1) * this.indent + 'px'
+              }
+            },
+            renderContentFn({ item, index })
+          )
+      }
+    })
   }
 }
-</style>

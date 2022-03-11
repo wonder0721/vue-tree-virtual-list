@@ -1,0 +1,21 @@
+.vue-tree-virtual-list {
+  .treeitem {
+    display: flex;
+    align-items: center;
+    .fold-btn {
+      width: 14px;
+      height: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      .icon {
+        cursor: pointer;
+      }
+    }
+    .node-content {
+      margin-left: 5px;
+      cursor: pointer;
+    }
+  }
+}

@@ -15,16 +15,17 @@ export default {
     }
   },
   render(h) {
+    let _vm = this
     return h('input', {
       ref: 'checkbox',
       attrs: {
         type: 'checkbox',
-        checked: this.checked
+        checked: _vm.checked
       },
       on: {
-        change: ($event) => {
+        change: $event => {
           let value = $event.target.checked
-          this.$emit('change', value)
+          _vm.$emit('change', value)
         }
       }
     })
@@ -35,6 +36,11 @@ export default {
     }
   },
   watch: {
+    checked: {
+      handler(val) {
+        this.$refs.checkbox.checked = val
+      }
+    },
     showIndeterminate: {
       handler(val) {
         this.$nextTick(() => {

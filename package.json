@@ -3,16 +3,20 @@
   "version": "0.1.0",
   "description": "A Vue tree component to deal with large amounts of data, based on vue-virtual-scroll-list",
   "license": "MIT",
-  "main": "dist/vuedraggable.umd.min.js",
+  "main": "dist/vue-tree-virtual-list.umd.min.js",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --name vue-tree-virtual-list --entry ./src/index.vue --target lib"
+    "build": "vue-cli-service build --name vue-tree-virtual-list --entry ./src/index.js --target lib"
   },
   "keywords": [
     "vue",
     "vuejs",
-    "tree",
+    "big-data",
+    "big-list",
+    "scroll-list",
+    "virtual-list",
+    "virtual-tree",
     "virtual-scroll",
     "virtual-list"
   ],
@@ -21,7 +25,6 @@
     "url": "https://github.com/wonder0721/vue-tree-virtual-list.git"
   },
   "dependencies": {
-    "vue": "^2.6.11",
     "vue-virtual-scroll-list": "^2.3.3"
   },
   "devDependencies": {
