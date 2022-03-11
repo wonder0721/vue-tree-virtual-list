@@ -4892,6 +4892,12 @@ var src_0 = __webpack_require__("1e09");
         return 300;
       }
     },
+    keeps: {
+      type: Number,
+      default: function _default() {
+        return 30;
+      }
+    },
     props: {
       type: Object,
       default: function _default() {
@@ -5213,7 +5219,8 @@ var src_0 = __webpack_require__("1e09");
       props: {
         'data-key': 'id',
         'data-sources': this.items,
-        'data-component': {}
+        'data-component': {},
+        keeps: this.keeps
       },
       scopedSlots: {
         item: function item(_ref2) {
